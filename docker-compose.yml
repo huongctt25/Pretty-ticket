@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: dummy-ticket-db
+    image: postgres:12-alpine
+    restart: unless-stopped
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${DB_USER:-pg}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-pg}
+      POSTGRES_DB: ${DB_DATABASE:-}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/postgres:/docker-entrypoint-initdb.d
+    networks:
+      - inner
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  inner:
+    driver: bridge
