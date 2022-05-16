@@ -4,6 +4,11 @@ import { Comment } from '../../comments/comments.entity'
 import { Expose } from 'class-transformer'
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger'
 
+export enum Role {
+  user = 'user',
+  admin = 'admin',
+}
+
 @Entity()
 export class User {
   @Expose()
@@ -20,10 +25,14 @@ export class User {
   @ApiHideProperty()
   password: string
 
-  @Column()
   @Expose()
   @ApiProperty()
-  role: string
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.user,
+  })
+  role: Role
 
   @OneToMany(() => Ticket, (ticket) => ticket.user)
   tickets: Ticket[]

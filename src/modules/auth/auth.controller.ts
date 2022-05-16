@@ -16,6 +16,7 @@ import { LocalAuthGuard } from './local-auth.guard'
 import { JwtAuthGuard } from './jwt-auth.guard'
 import { User } from '../users/entities/users.entity'
 import { ApiTags } from '@nestjs/swagger'
+import { SignInDto } from './dto/signin.dto'
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -29,14 +30,14 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/signin')
-  async login(@Request() req, @Body() body: AuthDto) {
+  async login(@Request() req, @Body() body: SignInDto) {
     console.log('here')
     return this.authService.login(req.user)
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Get('/profile')
-  // getProfile(@Request() req) {
-  //   return req.user
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  getProfile(@Request() req) {
+    return req.user
+  }
 }

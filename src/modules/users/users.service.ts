@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
 import { runInTrx } from 'src/common'
 import { Connection, EntityManager, Repository } from 'typeorm'
-import { User } from './entities/users.entity'
+import { Role, User } from './entities/users.entity'
 
 @Injectable()
 export class UsersService {
@@ -17,7 +17,7 @@ export class UsersService {
     )
   }
 
-  create(email: string, password: string, role: string) {
+  create(email: string, password: string, role: Role) {
     return this.runInTrx((repo) => {
       const user = repo.create({ email, password, role })
 
@@ -33,7 +33,7 @@ export class UsersService {
 
   async findAdmin() {
     return this.runInTrx((repo) => {
-      return repo.find({ role: 'admin' })
+      return repo.find({ role: Role.admin })
     })
   }
 }
