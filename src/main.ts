@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { ConfigService, ConfigType } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
@@ -21,7 +22,7 @@ async function bootstrap() {
 
   app.enableShutdownHooks()
 
-  await app.listen(base.port)
-  console.log(`Running on: ${await app.getUrl()}`)
+  await app.listen(base.port, '0.0.0.0')
+  Logger.log(`Running on: ${await app.getUrl()}`)
 }
 bootstrap()

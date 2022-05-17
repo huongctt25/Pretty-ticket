@@ -17,7 +17,7 @@ export class UsersService {
     )
   }
 
-  create(email: string, password: string, role: Role) {
+  create(email: string, password: string, role: Role): Promise<User> {
     return this.runInTrx((repo) => {
       const user = repo.create({ email, password, role })
 
@@ -25,13 +25,25 @@ export class UsersService {
     })
   }
 
-  async findOne(email: string) {
+  async findOne(email: string): Promise<User[]> {
     return this.runInTrx((repo) => {
       return repo.find({ email })
     })
   }
 
-  async findAdmin() {
+  async findByEmail(email: string): Promise<User> {
+    return this.runInTrx((repo) => {
+      return repo.findOne({ email })
+    })
+  }
+
+  async findById(id: number): Promise<User> {
+    return this.runInTrx((repo) => {
+      return repo.findOneOrFail({ id })
+    })
+  }
+
+  async findAdmin(): Promise<User[]> {
     return this.runInTrx((repo) => {
       return repo.find({ role: Role.admin })
     })

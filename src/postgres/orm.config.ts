@@ -4,7 +4,7 @@ import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm'
 import { ConnectionOptions } from 'typeorm'
 import { dbEnv } from './db.env'
 import { User } from 'src/modules/users/entities/users.entity'
-import { Ticket } from 'src/modules/tickets/tickets.entity'
+import { Ticket } from 'src/modules/tickets/entities/tickets.entity'
 import { Comment } from 'src/modules/comments/comments.entity'
 const entities = [User, Ticket, Comment]
 
