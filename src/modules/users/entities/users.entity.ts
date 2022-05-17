@@ -1,8 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm'
-import { Ticket } from '../../tickets/tickets.entity'
+import { Ticket } from '../../tickets/entities/tickets.entity'
 import { Comment } from '../../comments/comments.entity'
 import { Expose } from 'class-transformer'
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger'
+import { AbstractEntity } from 'src/common/base.enity'
 
 export enum Role {
   user = 'user',
@@ -10,7 +11,7 @@ export enum Role {
 }
 
 @Entity()
-export class User {
+export class User extends AbstractEntity {
   @Expose()
   @PrimaryGeneratedColumn()
   @ApiProperty()

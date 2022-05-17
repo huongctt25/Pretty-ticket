@@ -14,18 +14,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
   async signup(email: string, password: string): Promise<User> {
-    const users = await this.usersService.findOne(email)
-    if (users.length) {
+    const userWithSameEmail = await this.usersService.findByEmail(email)
+    if (userWithSameEmail) {
       throw new BadRequestException('email in use')
     }
     const admin = await this.usersService.findAdmin()
-    let role = Role.user
-    if (admin.length == 0) {
-      role = Role.admin
-    }
-    const user = await this.usersService.create(email, password, role)
-    console.log(user)
-    // return the user
+
+    const user = await this.usersService.create(
+      email,
+      password,
+      admin.length === 0 ? Role.admin : Role.user,
+    )
     return user
   }
 
@@ -36,8 +35,8 @@ export class AuthService {
     }
   }
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findOne(email)
+  async validateUser(email: string, password: string): Promise<User> {
+    const user = await this.usersService.findByEmail(email)
     if (!user) {
       throw new NotFoundException('user not found')
     }

@@ -30,14 +30,13 @@ export class AuthController {
 
   @UseGuards(LocalAuthGuard)
   @Post('/signin')
-  async login(@Request() req, @Body() body: SignInDto) {
-    console.log('here')
+  async login(@Request() req, @Body() body: SignInDto): Promise<any> {
     return this.authService.login(req.user)
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req): Promise<any> {
     return req.user
   }
 }
