@@ -16,6 +16,8 @@ import {
   Pagination,
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate'
+import { SearchTicketDto } from './dto/search_tickets.dto'
+import { resolveIdFromParam } from '../comments/util/check-id'
 
 @Injectable()
 export class TicketsService {
@@ -33,12 +35,6 @@ export class TicketsService {
     )
   }
 
-  async paginate(options: IPaginationOptions): Promise<Pagination<Ticket>> {
-    return this.runInTrx(async (repo) => {
-      return paginate<Ticket>(repo, options)
-    })
-  }
-
   create(title: string, description: string, reqUser: User): Promise<Ticket> {
     return this.runInTrx(async (repo) => {
       const user = await this.usersService.findById(reqUser.id)
@@ -53,8 +49,8 @@ export class TicketsService {
 
   findUserTickets(
     reqUser: User,
-    sortBy: string,
-    type: string,
+    sortBy: string = 'createdAt',
+    type: string = 'ASC',
   ): Promise<Ticket[]> {
     return this.runInTrx(async (repo) => {
       let query = repo
@@ -83,8 +79,22 @@ export class TicketsService {
     })
   }
 
-  closeTicket(id: number, user: User): Promise<Ticket> {
+  show(idString: string, user: User) {
     return this.runInTrx(async (repo) => {
+      const id = resolveIdFromParam(idString)
+      const ticket = await this.findById(id)
+      if (ticket.user.id !== user.id && user.role !== Role.admin) {
+        throw new ForbiddenException(
+          'only admin and the owner can get ticket detail',
+        )
+      }
+      return ticket
+    })
+  }
+
+  closeTicket(idString: string, user: User): Promise<Ticket> {
+    return this.runInTrx(async (repo) => {
+      const id = resolveIdFromParam(idString)
       const ticket = await this.findById(id)
       if (ticket.user.id != user.id && user.role != Role.admin) {
         throw new ForbiddenException(
@@ -99,8 +109,9 @@ export class TicketsService {
     })
   }
 
-  resolveTicket(id: number, user: User): Promise<Ticket> {
+  resolveTicket(idString: string, user: User): Promise<Ticket> {
     return this.runInTrx(async (repo) => {
+      const id = resolveIdFromParam(idString)
       const ticket = await this.findById(id)
       if (ticket.status !== TicketStatus.pending) {
         throw new BadRequestException('you can only resolve the pending ticket')
@@ -109,8 +120,9 @@ export class TicketsService {
     })
   }
 
-  deleteTicket(id: number, user: User): Promise<any> {
+  deleteTicket(idString: string, user: User): Promise<any> {
     return this.runInTrx(async (repo) => {
+      const id = resolveIdFromParam(idString)
       const ticket = await this.findById(id)
       if (ticket.user.id !== user.id) {
         throw new ForbiddenException(
@@ -121,25 +133,79 @@ export class TicketsService {
     })
   }
 
-  search(title: string, status: string, email: string): Promise<Ticket[]> {
+  search({
+    sortBy = 'createdAt',
+    ...searchDto
+  }: SearchTicketDto): Promise<Ticket[]> {
     return this.runInTrx(async (repo) => {
       let query = repo
         .createQueryBuilder('ticket')
         .leftJoinAndSelect('ticket.user', 'user')
-      if (title !== '') {
+      if (searchDto.title) {
         query = query.where('ticket.title ilike :title', {
-          title: `%${title}%`,
+          title: `%${searchDto.title}%`,
         })
       }
-      if (email !== '') {
-        query = query.where('user.email = :email', { email: email })
+      if (searchDto.email) {
+        query = query.where('user.email = :email', { email: searchDto.email })
       }
-      if (status !== '') {
-        query = query.where('ticket.status = :status', { status: status })
+      if (searchDto.status) {
+        query = query.where('ticket.status = :status', {
+          status: searchDto.status,
+        })
+      }
+      if (sortBy) {
+        const field = 'ticket.' + sortBy
+        query = query.orderBy(field, searchDto.type === 'DESC' ? 'DESC' : 'ASC')
       }
       const tickets = await query.getMany()
 
       return tickets
+    })
+  }
+
+  search2(searchDto: SearchTicketDto): Promise<{
+    data: Ticket[]
+    pageInfo: {
+      total: number
+      limit: number
+      offset: number
+    }
+  }> {
+    return this.runInTrx(async (repo) => {
+      const query = repo
+        .createQueryBuilder('ticket')
+        .leftJoinAndSelect('ticket.user', 'user')
+      if (searchDto.title) {
+        query.andWhere('ticket.title ilike :title', {
+          title: `%${searchDto.title}%`,
+        })
+      }
+      if (searchDto.email) {
+        query.andWhere('user.email = :email', { email: searchDto.email })
+      }
+      if (searchDto.status) {
+        query.andWhere('ticket.status = :status', {
+          status: searchDto.status,
+        })
+      }
+      if (searchDto.sortBy) {
+        const field = 'ticket.' + searchDto.sortBy
+        query.orderBy(field, searchDto.type || 'DESC')
+      }
+
+      query.take(2).offset(0)
+
+      const [data, total] = await query.getManyAndCount()
+
+      return {
+        data,
+        pageInfo: {
+          total,
+          offset: 0,
+          limit: 10,
+        },
+      }
     })
   }
 }

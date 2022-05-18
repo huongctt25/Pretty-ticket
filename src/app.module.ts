@@ -8,6 +8,7 @@ import { dbEnv, OrmConfig } from './postgres'
 import { UsersModule } from './modules/users/users.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { TicketsModule } from './modules/tickets/tickets.module'
+import { CommentsModule } from './modules/comments/comments.module'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { TicketsModule } from './modules/tickets/tickets.module'
     UsersModule,
     AuthModule,
     TicketsModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
