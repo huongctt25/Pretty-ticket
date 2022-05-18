@@ -15,7 +15,7 @@ export class Comment extends AbstractEntity {
   @Expose()
   @ApiProperty()
   @Column()
-  comment: string
+  content: string
 
   @Expose()
   @ManyToOne(() => User, (user) => user.comments)
