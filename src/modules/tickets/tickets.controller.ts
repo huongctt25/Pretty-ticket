@@ -8,15 +8,13 @@ import {
   Param,
   Patch,
   Delete,
-  UnauthorizedException,
   Query,
-  ForbiddenException,
-  DefaultValuePipe,
-  ParseIntPipe,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 import { AdminGuard } from 'src/guards/admin.guard'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
-import { Role } from '../users/entities/users.entity'
 import { CreateTicketDto } from './dto/create_ticket.dto'
 import { SearchTicketDto } from './dto/search_tickets.dto'
 import { Ticket } from './entities/tickets.entity'
@@ -32,6 +30,16 @@ export class TicketsController {
     return this.ticketService.create(body.title, body.description, req.user)
   }
 
+  @Post('/:id/upload')
+  @UseInterceptors(FileInterceptor('file'))
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
+    @Request() req,
+  ): Promise<Ticket> {
+    return this.ticketService.uploadFile(id, file, req.user)
+  }
+
   @Get()
   getUserTickets(@Request() req): Promise<Ticket[]> {
     return this.ticketService.findUserTickets(
@@ -44,7 +52,7 @@ export class TicketsController {
   @UseGuards(AdminGuard)
   @Get('/search')
   search(@Request() req, @Query() dto: SearchTicketDto): Promise<any> {
-    return this.ticketService.search2(dto)
+    return this.ticketService.search(dto)
   }
 
   @Get('/:id')

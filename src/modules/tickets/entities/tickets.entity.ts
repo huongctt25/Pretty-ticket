@@ -35,6 +35,11 @@ export class Ticket extends AbstractEntity {
 
   @Expose()
   @ApiProperty()
+  @Column({ default: '' })
+  file: string
+
+  @Expose()
+  @ApiProperty()
   @Column({
     type: 'enum',
     enum: TicketStatus,
