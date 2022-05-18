@@ -24,9 +24,9 @@ export class SearchTicketDto {
 
   @IsOptional()
   @IsNumber()
-  page: number
+  limit: number
 
   @IsOptional()
   @IsNumber()
-  limit: number
+  offset: number
 }

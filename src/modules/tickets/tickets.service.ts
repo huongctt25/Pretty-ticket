@@ -133,38 +133,24 @@ export class TicketsService {
     })
   }
 
-  search({
-    sortBy = 'createdAt',
-    ...searchDto
-  }: SearchTicketDto): Promise<Ticket[]> {
+  uploadFile(
+    idString: string,
+    file: Express.Multer.File,
+    user: User,
+  ): Promise<Ticket> {
     return this.runInTrx(async (repo) => {
-      let query = repo
-        .createQueryBuilder('ticket')
-        .leftJoinAndSelect('ticket.user', 'user')
-      if (searchDto.title) {
-        query = query.where('ticket.title ilike :title', {
-          title: `%${searchDto.title}%`,
-        })
+      const id = resolveIdFromParam(idString)
+      const ticket = await this.findById(id)
+      if (ticket.user.id !== user.id) {
+        throw new ForbiddenException(
+          'only the ticket owner can upload file for this ticket',
+        )
       }
-      if (searchDto.email) {
-        query = query.where('user.email = :email', { email: searchDto.email })
-      }
-      if (searchDto.status) {
-        query = query.where('ticket.status = :status', {
-          status: searchDto.status,
-        })
-      }
-      if (sortBy) {
-        const field = 'ticket.' + sortBy
-        query = query.orderBy(field, searchDto.type === 'DESC' ? 'DESC' : 'ASC')
-      }
-      const tickets = await query.getMany()
-
-      return tickets
+      return repo.save({ ...ticket, file: file.originalname })
     })
   }
 
-  search2(searchDto: SearchTicketDto): Promise<{
+  search({ offset = 0, limit = 2, ...searchDto }: SearchTicketDto): Promise<{
     data: Ticket[]
     pageInfo: {
       total: number
@@ -194,7 +180,7 @@ export class TicketsService {
         query.orderBy(field, searchDto.type || 'DESC')
       }
 
-      query.take(2).offset(0)
+      query.take(limit).offset(offset)
 
       const [data, total] = await query.getManyAndCount()
 
@@ -202,8 +188,8 @@ export class TicketsService {
         data,
         pageInfo: {
           total,
-          offset: 0,
-          limit: 10,
+          offset,
+          limit,
         },
       }
     })
