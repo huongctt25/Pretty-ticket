@@ -8,7 +8,7 @@ import {
 import { InjectConnection } from '@nestjs/typeorm'
 import { Connection, EntityManager, Repository } from 'typeorm'
 import { Ticket, TicketStatus } from './entities/tickets.entity'
-import { runInTrx } from 'src/common'
+import { runInTrx } from '../../common'
 import { Role, User } from '../users/entities/users.entity'
 import { UsersService } from '../users/users.service'
 import {
@@ -116,6 +116,9 @@ export class TicketsService {
       if (ticket.status !== TicketStatus.pending) {
         throw new BadRequestException('you can only resolve the pending ticket')
       }
+      if (user.role != Role.admin) {
+        throw new ForbiddenException('Only admin resolve ticket')
+      }
       return repo.save({ ...ticket, status: TicketStatus.resolved })
     })
   }
@@ -147,6 +150,19 @@ export class TicketsService {
         )
       }
       return repo.save({ ...ticket, file: file.originalname })
+    })
+  }
+
+  deleteFile(idString: string, user: User): Promise<Ticket> {
+    return this.runInTrx(async (repo) => {
+      const id = resolveIdFromParam(idString)
+      const ticket = await this.findById(id)
+      if (ticket.user.id !== user.id) {
+        throw new ForbiddenException(
+          'only the ticket owner can delete file for this ticket',
+        )
+      }
+      return repo.save({ ...ticket, file: '' })
     })
   }
 

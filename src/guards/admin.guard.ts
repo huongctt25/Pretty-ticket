@@ -1,5 +1,5 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common'
-import { Role } from 'src/modules/users/entities/users.entity'
+import { Role } from '../modules/users/entities/users.entity'
 
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext) {
@@ -8,6 +8,6 @@ export class AdminGuard implements CanActivate {
       return false
     }
 
-    return request.user.role == Role.admin
+    return request.user.role === Role.admin
   }
 }

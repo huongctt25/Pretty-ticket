@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectConnection } from '@nestjs/typeorm'
-import { runInTrx } from 'src/common/base.enity'
+import { runInTrx } from '../../common'
 import { Connection, EntityManager, Repository } from 'typeorm'
 import { Ticket } from '../tickets/entities/tickets.entity'
 import { TicketsService } from '../tickets/tickets.service'

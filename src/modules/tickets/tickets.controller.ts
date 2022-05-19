@@ -13,7 +13,7 @@ import {
   UploadedFile,
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
-import { AdminGuard } from 'src/guards/admin.guard'
+import { AdminGuard } from '../../guards/admin.guard'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { CreateTicketDto } from './dto/create_ticket.dto'
 import { SearchTicketDto } from './dto/search_tickets.dto'
@@ -38,6 +38,12 @@ export class TicketsController {
     @Request() req,
   ): Promise<Ticket> {
     return this.ticketService.uploadFile(id, file, req.user)
+  }
+
+  @Delete('/:id/delete_file')
+  @UseInterceptors(FileInterceptor('file'))
+  deleteFile(@Param('id') id: string, @Request() req): Promise<Ticket> {
+    return this.ticketService.deleteFile(id, req.user)
   }
 
   @Get()

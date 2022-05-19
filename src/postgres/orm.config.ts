@@ -2,10 +2,11 @@ import { Inject, Injectable } from '@nestjs/common'
 import { ConfigType } from '@nestjs/config'
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm'
 import { ConnectionOptions } from 'typeorm'
+import { Comment } from '../modules/comments/comments.entity'
+import { Ticket } from '../modules/tickets/entities/tickets.entity'
+import { User } from '../modules/users/entities/users.entity'
 import { dbEnv } from './db.env'
-import { User } from 'src/modules/users/entities/users.entity'
-import { Ticket } from 'src/modules/tickets/entities/tickets.entity'
-import { Comment } from 'src/modules/comments/comments.entity'
+
 const entities = [User, Ticket, Comment]
 
 @Injectable()
