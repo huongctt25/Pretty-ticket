@@ -1,9 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm'
 import { User } from '../users/entities/users.entity'
 import { Ticket } from '../tickets/entities/tickets.entity'
-import { AbstractEntity } from 'src/common/base.enity'
 import { Expose } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
+import { AbstractEntity } from '../../common'
 
 @Entity()
 export class Comment extends AbstractEntity {

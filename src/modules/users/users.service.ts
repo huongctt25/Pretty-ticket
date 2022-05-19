@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm'
-import { runInTrx } from 'src/common'
+import { runInTrx } from '../../common'
+
 import { Connection, EntityManager, Repository } from 'typeorm'
 import { Role, User } from './entities/users.entity'
 

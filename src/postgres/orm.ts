@@ -8,6 +8,7 @@ const config = {
   ...new OrmConfig(dbEnv()).createTypeOrmOptions(),
   // logging: true,
 } as ConnectionOptions
+
 const setup = async (
   mockFn: MockFunc = () => Promise.resolve(),
 ): Promise<void> => {
@@ -20,7 +21,7 @@ const setup = async (
     name: 'setup',
   })
   const qr = conn.createQueryRunner()
-  await qr.dropDatabase(config.database as string, true)
+  // await qr.dropDatabase(config.database as string, true)
   await qr.createDatabase(config.database as string, true)
   await qr.release()
   await conn.close()

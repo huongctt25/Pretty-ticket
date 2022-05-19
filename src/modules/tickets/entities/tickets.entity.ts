@@ -9,7 +9,7 @@ import { User } from '../../users/entities/users.entity'
 import { Comment } from '../../comments/comments.entity'
 import { Expose } from 'class-transformer'
 import { ApiProperty } from '@nestjs/swagger'
-import { AbstractEntity } from 'src/common/base.enity'
+import { AbstractEntity } from '../../../common'
 
 export enum TicketStatus {
   pending = 'pending',
