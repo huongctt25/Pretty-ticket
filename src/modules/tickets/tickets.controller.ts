@@ -58,7 +58,7 @@ export class TicketsController {
   @UseGuards(AdminGuard)
   @Get('/search')
   search(@Request() req, @Query() dto: SearchTicketDto): Promise<any> {
-    return this.ticketService.search(dto)
+    return this.ticketService.search2(dto)
   }
 
   @Get('/:id')
