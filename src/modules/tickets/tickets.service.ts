@@ -210,4 +210,55 @@ export class TicketsService {
       }
     })
   }
+
+  search2({ offset = 0, limit = 2, ...searchDto }: SearchTicketDto): Promise<{
+    data: Ticket[]
+    pageInfo: {
+      total: number
+      limit: number
+      offset: number
+    }
+  }> {
+    return this.runInTrx(async (repo) => {
+      const query = repo.createQueryBuilder('ticket')
+      if (searchDto.email) {
+        const user = await repo.manager
+          .getRepository(User)
+          .createQueryBuilder('user')
+          .where({ email: searchDto.email })
+          .select(['user.id'])
+          .getOne()
+        query.andWhere('ticket.userId = :userId', {
+          userId: user.id,
+        })
+      }
+      if (searchDto.title) {
+        query.andWhere('ticket.title ilike :title', {
+          title: `%${searchDto.title}%`,
+        })
+      }
+      if (searchDto.status) {
+        query.andWhere('ticket.status = :status', {
+          status: searchDto.status,
+        })
+      }
+      if (searchDto.sortBy) {
+        const field = 'ticket.' + searchDto.sortBy
+        query.orderBy(field, searchDto.type || 'DESC')
+      }
+
+      query.take(limit).offset(offset)
+
+      const [data, total] = await query.getManyAndCount()
+
+      return {
+        data,
+        pageInfo: {
+          total,
+          offset,
+          limit,
+        },
+      }
+    })
+  }
 }

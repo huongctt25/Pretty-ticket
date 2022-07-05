@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   OneToMany,
+  JoinColumn,
 } from 'typeorm'
 import { User } from '../../users/entities/users.entity'
 import { Comment } from '../../comments/comments.entity'
@@ -48,7 +49,12 @@ export class Ticket extends AbstractEntity {
   status: TicketStatus
 
   @Expose()
+  @Column({ name: 'user_id' })
+  userId: number
+
+  @Expose()
   @ManyToOne(() => User, (user) => user.tickets)
+  @JoinColumn({ name: 'user_id' })
   user: User
 
   @Expose()
