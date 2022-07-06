@@ -6,7 +6,9 @@ import { AppModule } from './app.module'
 import { appConfig, baseEnv, BASE_ENV } from './configs'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+  })
   const configService = app.get(ConfigService)
   const base = configService.get<ConfigType<typeof baseEnv>>(BASE_ENV)
 
@@ -21,6 +23,7 @@ async function bootstrap() {
   SwaggerModule.setup('/api/docs', app, document)
 
   app.enableShutdownHooks()
+  // app.enableCors()
 
   await app.listen(base.port, '0.0.0.0')
   Logger.log(`Running on: ${await app.getUrl()}`)

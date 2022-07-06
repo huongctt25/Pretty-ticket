@@ -28,10 +28,12 @@ export class AuthController {
     return this.authService.signup(body.email, body.password)
   }
 
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   @Post('/signin')
   async login(@Request() req, @Body() body: SignInDto): Promise<any> {
-    return this.authService.login(req.user)
+    console.log({ body })
+    // return this.authService.login(req.user)
+    return this.authService.login({ email: body.username })
   }
 
   @UseGuards(JwtAuthGuard)
