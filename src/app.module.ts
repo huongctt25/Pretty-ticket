@@ -9,6 +9,8 @@ import { UsersModule } from './modules/users/users.module'
 import { AuthModule } from './modules/auth/auth.module'
 import { TicketsModule } from './modules/tickets/tickets.module'
 import { CommentsModule } from './modules/comments/comments.module'
+import { ChatGateway } from './chat.gateway'
+import { ChatsModule } from './modules/chats/chats.module'
 
 @Module({
   imports: [
@@ -22,8 +24,9 @@ import { CommentsModule } from './modules/comments/comments.module'
     AuthModule,
     TicketsModule,
     CommentsModule,
+    ChatsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ChatGateway],
 })
 export class AppModule {}
