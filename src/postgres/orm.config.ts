@@ -2,12 +2,13 @@ import { Inject, Injectable } from '@nestjs/common'
 import { ConfigType } from '@nestjs/config'
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from '@nestjs/typeorm'
 import { ConnectionOptions } from 'typeorm'
+import { Chat } from '../modules/chats/chats.entity'
 import { Comment } from '../modules/comments/comments.entity'
 import { Ticket } from '../modules/tickets/entities/tickets.entity'
 import { User } from '../modules/users/entities/users.entity'
 import { dbEnv } from './db.env'
 
-const entities = [User, Ticket, Comment]
+const entities = [User, Ticket, Comment, Chat]
 
 @Injectable()
 export class OrmConfig implements TypeOrmOptionsFactory {

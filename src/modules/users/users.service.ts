@@ -32,6 +32,12 @@ export class UsersService {
     })
   }
 
+  async findAll(): Promise<User[]> {
+    return this.runInTrx((repo) => {
+      return repo.find({})
+    })
+  }
+
   async findByEmail(email: string): Promise<User> {
     return this.runInTrx((repo) => {
       return repo.findOne({ email })
